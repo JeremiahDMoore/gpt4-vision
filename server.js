@@ -16,12 +16,6 @@ app.post('/process-image', async (req, res) => {
   }
 });
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
-
-
 dotenv.config();
 
 async function askAboutImages(base64Image, prompt) {
