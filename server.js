@@ -4,9 +4,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const app = express();
-app.use(bodyParser.json({ limit: '500mb' }));
+app.use(bodyParser.json({ limit: '50mb' }));
 
 const foodPrompt = "You are an expert chef, foodie and nutritionist. You are able to recognize any cuisine, dish, meal, cocktail, beverage or food & drink item at a glance and identify it. You understand the nutritional value of all foods and drinks. You can determine any edible food item from a non edible one. INSTRUCTIONS: First, determine if photo is of edible or imbibable food and/or drink items; if it is not an edible food or drink item, meal, dish, beverage, cocktail or cuisine then return (You don't really want to eat this, do you?);  Else you will Give me the ingredients used to make this dish, meal, or cocktail; Give me a recipe to recreate this dish, meal or cocktail"
+
 
 app.post('/process-image', async (req, res) => {
   try {
@@ -17,6 +18,12 @@ app.post('/process-image', async (req, res) => {
     res.status(500).send({ error: error.message });
   }
 });
+
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
+
 
 dotenv.config();
 
@@ -38,7 +45,7 @@ async function askAboutImages(base64Image, prompt) {
         ],
       },
     ],
-    max_tokens: 2000,
+    max_tokens: 1000,
   });
 
   console.log('RESPONSE HERE', response.choices[0].message.content);
