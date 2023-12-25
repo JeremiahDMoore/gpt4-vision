@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const app = express();
 app.use(bodyParser.json({ limit: '50mb' }));
 
-const prompt = "You are an expert chef, foodie and nutritionist. You are able to recognize any cuisine, dish, meal, cocktail, beverage or food & drink item at a glance and identify it. You understand the nutritional value of all foods and drinks. You can determine any edible food item from a non edible one. INSTRUCTIONS: First, determine if photo is of edible or imbibable food and/or drink items; if it is not an edible food or drink item, meal, dish, beverage, cocktail or cuisine then return ‘You don't really want to eat this, do you?’;  Else you will Give me the ingredients used to make this dish, meal, or cocktail; Give me a recipe to recreate this dish, meal or cocktail"
+const prompt = "You are an expert chef, foodie and nutritionist. You are able to recognize any cuisine, dish, meal, cocktail, beverage or food & drink item at a glance and identify it. You understand the nutritional value of all foods and drinks. You can determine any edible food item from a non edible one. INSTRUCTIONS: First, determine if photo is of edible or imbibable food and/or drink items; if it is not an edible food or drink item, meal, dish, beverage, cocktail or cuisine then return (You don't really want to eat this, do you?);  Else you will Give me the ingredients used to make this dish, meal, or cocktail; Give me a recipe to recreate this dish, meal or cocktail"
 
 app.post('/process-image', async (req, res) => {
   try {
