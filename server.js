@@ -44,7 +44,7 @@ async function askAboutImages(base64Image, prompt) {
         ],
       },
     ],
-    max_tokens: 1000,
+    max_tokens: 350,
   });
 
   console.log('RESPONSE HERE', response.choices[0].message.content);
