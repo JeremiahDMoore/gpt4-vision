@@ -2,6 +2,7 @@ const OpenAI = require('openai');
 const dotenv = require('dotenv');
 const express = require('express');
 const bodyParser = require('body-parser');
+const axios = require('axios');
 
 const app = express();
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -26,40 +27,30 @@ app.post('/generate-recipe', async (req, res) => {
   try {
     const { dishName, diet, otherConsiderations } = req.body;
 
-    // Call an external server or implement your recipe generation logic here
-    // For demonstration, I'm just logging the received data
-    console.log('Received recipe request:', { dishName, diet, otherConsiderations });
-    
     const recipe = await axios.post('https://api.openai.com/v1/chat/completions', {
-      model: "gpt-3.5-turbo-16k-0613",  // Use the correct model identifier here
+      model: "gpt-3.5-turbo",
       temperature: 0.8,
       top_p: 1,
-      messages: 
-          { role: "system", content: generatePrompt(dishName, diet, otherConsiderations) },
- 
+      messages: [
+        { role: "system", content: generatePrompt(dishName, diet, otherConsiderations) }
+      ]
+    }, {
       headers: {
-          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
       }
-  });
- 
-       // Check if the API response is successful and contains data
-       if (recipe && recipe.data && recipe.data.choices && recipe.data.choices.length > 0) {
-        // Extracting the text from the first choice (most relevant response)
-        const recipeText = recipe.data.choices[0].text;
-  
-        // Send the actual recipe text as response
-        res.json({ success: true, recipe: recipeText });
-      } else {
-        // In case the API response doesn't have the expected format or is empty
-        res.status(500).json({ success: false, message: 'Failed to generate recipe' });
-      }
-    } catch (error) {
-      // Error handling remains the same
-      res.status(500).send({ error: error.message });
+    });
+
+    if (recipe.data && recipe.data.choices && recipe.data.choices.length > 0) {
+      const recipeText = recipe.data.choices[0].message.content;
+      res.json({ success: true, recipe: recipeText });
+    } else {
+      res.status(500).json({ success: false, message: 'Failed to generate recipe' });
     }
-  });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
