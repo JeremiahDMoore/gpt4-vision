@@ -58,25 +58,32 @@ app.post('/generate-recipe', async (req, res) => {
     res.status(500).send({ error: error.message });
   }
 });
+
 // IMAGE: generates an image of the recipe
 app.post('/generate-image', async (req, res) => {
   try {
     const { dishName, diet, otherConsiderations } = req.body;
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const prompt = generateImage(dishName, diet, otherConsiderations);
 
-    const imageGen = await openai.createImage({
+    const response = await axios.post('https://api.openai.com/v1/images/generations', {
       model: "dall-e-3",
-      prompt: generateImage(dishName, diet, otherConsiderations),
+      prompt: prompt,
       n: 1,
-      size: "1024x1024",
+      size: "1024x1024"
+    }, {
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
     });
-    image_url = imageGen.data.data[0].url;
-    res.json({ success: true, recipe: image_url });
-    console.log(res);
+
+    const imageUrl = response.data.data[0].url;
+    res.json({ success: true, recipe: imageUrl });
   } catch (error) {
     res.status(500).send({ error: error.message });
   }
 });
+
 
 
 const port = process.env.PORT || 3000;
