@@ -62,8 +62,9 @@ app.post('/generate-recipe', async (req, res) => {
 app.post('/generate-image', async (req, res) => {
   try {
     const { dishName, diet, otherConsiderations } = req.body;
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-    const imageGen = await OpenAI.createImage({
+    const imageGen = await openai.createImage({
       model: "dall-e-3",
       prompt: generateImage(dishName, diet, otherConsiderations),
       n: 1,
