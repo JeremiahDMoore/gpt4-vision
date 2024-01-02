@@ -66,7 +66,7 @@ app.post('/generate-image', async (req, res) => {
     const prompt = generateImage(dishName, diet, otherConsiderations);
 
     const response = await axios.post('https://api.openai.com/v1/images/generations', {
-      model: "dall-e-3",
+      model: "dall-e-2",
       prompt: prompt,
       n: 1,
       size: "1024x1024"
