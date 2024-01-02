@@ -71,6 +71,8 @@ app.post('/generate-image', async (req, res) => {
       size: "1024x1024",
     });
     image_url = imageGen.data.data[0].url;
+    res.json({ success: true, recipe: image_url });
+    console.log(res);
   } catch (error) {
     res.status(500).send({ error: error.message });
   }
