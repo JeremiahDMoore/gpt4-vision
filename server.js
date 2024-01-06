@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
+const sharp = require('sharp');
 
 const app = express();
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -61,30 +62,43 @@ app.post('/generate-recipe', async (req, res) => {
 
 // IMAGE: generates an image of the recipe
 app.post('/generate-image', async (req, res) => {
-  try {
-    const { dishName, diet, otherConsiderations } = req.body;
-    const prompt = generateImage(dishName, diet, otherConsiderations);
+    try {
+        const { dishName, diet, otherConsiderations } = req.body;
+        const prompt = generateImage(dishName, diet, otherConsiderations);
 
-    const response = await axios.post('https://api.openai.com/v1/images/generations', {
-      model: "dall-e-2",
-      prompt: prompt,
-      n: 1,
-      size: "1024x1024"
-    }, {
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Type': 'application/json'
-      }
-    });
+        // Generate image using DALL-E
+        const response = await axios.post('https://api.openai.com/v1/images/generations', {
+            model: "dall-e-3",
+            prompt: prompt,
+            n: 1,
+            size: "1024x1024"
+        }, {
+            headers: {
+                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+                'Content-Type': 'application/json'
+            }
+        });
 
-    const imageUrl = response.data.data[0].url;
-    res.json({ success: true, recipe: imageUrl });
-  } catch (error) {
-    res.status(500).send({ error: error.message });
-  }
+        // Fetch the generated image
+        const imageUrl = response.data.data[0].url;
+        const imageResponse = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+        const imageBuffer = Buffer.from(imageResponse.data, 'binary');
+
+        // Resize the image to 400x400
+        const resizedImage = await sharp(imageBuffer)
+            .resize(400, 400)
+            .toBuffer();
+
+        // Send the resized image directly to the client
+        // Alternatively, you can host the image and send the URL
+        res.set('Content-Type', 'image/png');
+        res.send(resizedImage);
+
+    } catch (error) {
+        console.error('Error generating image:', error);
+        res.status(500).send({ error: error.message });
+    }
 });
-
-
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
