@@ -16,7 +16,7 @@ function generateImage(dishName, diet, otherConsiderations) {
 }
 // RECIPE: prompt takes user data from profile or other source and generates the recipe
 function generatePrompt(dishName, diet, otherConsiderations) {
-  return `you will generate a recipe based on ${dishName} and ${otherConsiderations} that is ${diet}`
+  return `generate an accurate recipe based on ${dishName} and ${otherConsiderations} that is ${diet}`
 }
 // PHOTO: Generates recipe from photo
 app.post('/process-image', async (req, res) => {
