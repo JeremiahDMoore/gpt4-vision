@@ -68,6 +68,7 @@ app.post('/generate-image', async (req, res) => {
       model: "dall-e-3",
       prompt: prompt,
       n: 1,
+      style: "natural",
       size: "1024x1024"
     }, {
       headers: {
