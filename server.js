@@ -50,6 +50,7 @@ app.post('/generate-recipe', async (req, res) => {
     if (recipe.data && recipe.data.choices && recipe.data.choices.length > 0) {
       const recipeText = recipe.data.choices[0].message.content;
       res.json({ success: true, recipe: recipeText });
+      console.log(recipeText)
     } else {
       res.status(500).json({ success: false, message: 'Failed to generate recipe' });
     }
@@ -69,7 +70,7 @@ app.post('/generate-image', async (req, res) => {
       prompt: prompt,
       n: 1,
       // style: "natural",
-      size: "1024x1024"
+      size: "256x256"
     }, {
       headers: {
         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
