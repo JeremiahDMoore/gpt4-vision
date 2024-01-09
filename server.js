@@ -66,11 +66,12 @@ app.post('/generate-image', async (req, res) => {
     const prompt = generateImage(dishName, diet, otherConsiderations);
 
     const response = await axios.post('https://api.openai.com/v1/images/generations', {
-      model: "dall-e-2",
+      model: "dall-e-3",
       prompt: prompt,
       n: 1,
-      // style: "natural",
-      size: "256x256"
+      style: "natural",
+      size: "1024x1024",
+      // size: "256x256"
     }, {
       headers: {
         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
