@@ -35,7 +35,7 @@ app.post('/generate-recipe', async (req, res) => {
 
     const recipe = await axios.post('https://api.openai.com/v1/chat/completions', {
       model: "gpt-3.5-turbo",
-      temperature: 0.8,
+      temperature: 0,
       top_p: 1,
       messages: [
         { role: "system", content: generatePrompt(dishName, diet, otherConsiderations) } // uses generatePrompt to create recipe
