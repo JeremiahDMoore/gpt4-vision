@@ -51,6 +51,7 @@ app.post('/generate-recipe', async (req, res) => {
     if (recipe.data && recipe.data.choices && recipe.data.choices.length > 0) {
       const recipeText = recipe.data.choices[0].message.content;
       res.json({ success: true, recipe: recipeText });
+      console.log(recipeText)
     } else {
       res.status(500).json({ success: false, message: 'Failed to generate recipe' });
     }
@@ -61,41 +62,36 @@ app.post('/generate-recipe', async (req, res) => {
 
 // IMAGE: generates an image of the recipe
 app.post('/generate-image', async (req, res) => {
-    try {
-        const { dishName, diet, otherConsiderations } = req.body;
-        const prompt = generateImage(dishName, diet, otherConsiderations);
+  try {
+    const { dishName, diet, otherConsiderations } = req.body;
+    const prompt = generateImage(dishName, diet, otherConsiderations);
 
-        // Generate image using DALL-E
-        const response = await axios.post('https://api.openai.com/v1/images/generations', {
-            model: "dall-e-3",
-            prompt: prompt,
-            n: 1,
-            size: "1024x1024"
-        }, {
-            headers: {
-                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-                'Content-Type': 'application/json'
-            }
-        });
+    const response = await axios.post('https://api.openai.com/v1/images/generations', {
+      model: "dall-e-3",
+      prompt: prompt,
+      n: 1,
+      style: "natural",
+      size: "1024x1024",
+      // size: "256x256"
+    }, {
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
 
-        // Fetch the generated image
-        const imageUrl = response.data.data[0].url;
-        const imageResponse = await axios.get(imageUrl, { responseType: 'arraybuffer' });
-        const imageBuffer = Buffer.from(imageResponse.data, 'binary');
+    const imageUrl = response.data.data[0].url;
+    res.json({ success: true, recipe: imageUrl });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
 
-        // Resize the image to 400x400 using Jimp
-        const resizedImage = await Jimp.read(imageBuffer)
-            .then(image => image.resize(400, 400))
-            .then(image => image.getBufferAsync(Jimp.MIME_PNG));
 
-        // Send the resized image directly to the client
-        res.set('Content-Type', 'image/png');
-        res.send(resizedImage);
 
-    } catch (error) {
-        console.error('Error generating image:', error);
-        res.status(500).send({ error: error.message });
-    }
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
 
 dotenv.config();
