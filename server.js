@@ -13,11 +13,11 @@ const foodPrompt = "PERSONA=(You are an expert chef, foodie and nutritionist. Yo
 
 // IMAGE: prompt for generating an image for the RECIPE
 function generateImage(dishName, diet, otherConsiderations) {
-  return `A lifelike food photo of edible and delicious ${dishName}, ${diet}, ${otherConsiderations}, plated fancy on a chef table, blurred background of ingredients, realistic indoor lighting`
+  return `IMPORTANT:Use this prompt EXACTLY. DO NOT change or add anything -->("lifelike food photo of edible and delicious ${dishName}, ${diet}, ${otherConsiderations}, plated fancy on a chef table, blurred background of ingredients, realistic indoor lighting, (taken on sony camera with 35mm lens)")`
 }
 // RECIPE: prompt takes user data from profile or other source and generates the recipe
 function generatePrompt(dishName, diet, otherConsiderations) {
-  return `generate a recipe based on ${dishName} and ${otherConsiderations} that is ${diet}, it is very important to be concise and consistent. Return (Recipe Name \n Nutritional Value \n Ingredients \n Instructions)`
+  return `generate a recipe based on ${dishName} and ${otherConsiderations} that is ${diet}, it is very important to be concise and consistent. Return (Recipe Name <line break> Nutritional Value <line break> Ingredients <line break> Instructions)`
 }
 // PHOTO: Generates recipe from photo
 app.post('/process-image', async (req, res) => {
