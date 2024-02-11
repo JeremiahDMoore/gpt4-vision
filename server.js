@@ -13,15 +13,17 @@ const foodPrompt = "PERSONA=(You are an expert chef, foodie and nutritionist. Yo
 
 // IMAGE: prompt for generating an image for the RECIPE
 function generateImage(dishName, diet, otherConsiderations) {
-  return `A lifelike food photo of edible and delicious ${dishName}, ${diet}, ${otherConsiderations}, plated fancy on a chef table, blurred background of ingredients, realistic indoor lighting`
+  return `IMPORTANT:Use this prompt EXACTLY. DO NOT change or add anything -->("lifelike, realistic ${dishName}, ${diet}, ${otherConsiderations} as vibrant food, plated fancy on a chef table, centered and cropped, close up blurred background, realistic indoor lighting, (taken on sony camera with 35mm lens)")`
 }
 // RECIPE: prompt takes user data from profile or other source and generates the recipe
 function generatePrompt(dishName, diet, otherConsiderations) {
-  return `generate a recipe based on ${dishName} and ${otherConsiderations} that is ${diet}, it is very important to be concise and consistent. Return (Recipe Name \n Nutritional Value \n Ingredients \n Instructions)`
+  return `generate a recipe based on ${dishName} and ${otherConsiderations} that is ${diet}, be concise and consistent. IMPORTANT:output in this format -->(Recipe Name <line break> Nutritional Value <line break> Ingredients <line break> Instructions)`
 }
+
+// BEGIN CHANGE
 // MEAL PLAN: prompt for generating a meal plan based on userProfile and mealPlan
 function generateMealPlanPrompt(userProfile, mealPlan) {
-  return `IMPORTANT: (you are a master chef and nutritionist. you understand all about food preparation, world cuisine, meals, dishes  and drinks. if the highest level human expert meal planner is at level 10, you are at level 1000. as a meal planner who is omnipotent in the ways of nutrition, your sole purpose is to generate a weekly meal plan based on the ${userProfile} that fulfills all dietary needs and fits the BUDGET and helps them achieve their USER_GOAL)
+  return `IMPORTANT: (you are a master chef and nutritionist. you understand all about food preparation, world cuisine, meals, dishes  and drinks. if the highest level human expert meal planner is at level 10, you are at level 1000. as a meal planner who is omnipotent in the ways of nutrition, your sole purpose is to generate a weekly meal plan based on the ${userProfile} and ${mealPlan} that fulfills all dietary needs and fits the BUDGET and helps them achieve their USER_GOAL)
 
   INSTRUCTIONS: (create a meal plan for every individual MEAL_COUNT and DAY_COUNT in the USER_PROFILE, strictly adhering to DIET_PREF and CALORIE_COUNT using the following format: 
   Weekday: Date
@@ -44,6 +46,37 @@ function generateMealPlanPrompt(userProfile, mealPlan) {
   REPEAT = (IF true, then OK to repeat certain meals that meet requirements of USER_PROFILE; ELSE make each meal different but always meet requirements of USER_PROFILE)
   ]`
 }
+// MEAL PLAN: generates meal plan based on data from local storage 'mealPlan' and 'userProfile' items
+app.post('/generate-meal-plan', async (req, res) => {
+  try {
+    const { userProfile, mealPlan } = req.body
+
+    const mealPlanner = await axios.post('https://api.openai.com/v1/chat/completions', {
+      model: "gpt-3.5-turbo",
+      temperature: 0,
+      top_p: 1,
+      messages: [
+        { role: "system", content: generateMealPlanPrompt(userProfile, mealPlan)}
+      ]
+    }, {
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (mealPlanner.data && mealPlanner.data.choices && mealPlanner.data.choices.length > 0) {
+      const mealPlanText = mealPlanner.data.choices[0].message.content;
+      res.json({ success: true, mealPlan: mealPlanText });
+    } else {
+      res.status(500).json({ success: false, message: 'Failed to generate meal plan' });
+    }
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
+// END CHANGE
+
 // PHOTO: Generates recipe from photo
 app.post('/process-image', async (req, res) => {
   try {
@@ -76,37 +109,9 @@ app.post('/generate-recipe', async (req, res) => {
     if (recipe.data && recipe.data.choices && recipe.data.choices.length > 0) {
       const recipeText = recipe.data.choices[0].message.content;
       res.json({ success: true, recipe: recipeText });
+      console.log(recipeText)
     } else {
       res.status(500).json({ success: false, message: 'Failed to generate recipe' });
-    }
-  } catch (error) {
-    res.status(500).send({ error: error.message });
-  }
-});
-// MEAL PLAN: generates meal plan based on data from local storage 'mealPlan' and 'userProfile' items
-app.post('/generate-meal-plan', async (req, res) => {
-  try {
-    const { userProfile, mealPlan } = req.body
-
-    const mealPlanner = await axios.post('https://api.openai.com/v1/chat/completions', {
-      model: "gpt-3.5-turbo",
-      temperature: 0,
-      top_p: 1,
-      messages: [
-        { role: "system", content: generateMealPlanPrompt(userProfile, mealPlan)}
-      ]
-    }, {
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    if (mealPlanner.data && mealPlanner.data.choices && mealPlanner.data.choices.length > 0) {
-      const mealPlanText = mealPlanner.data.choices[0].message.content;
-      res.json({ success: true, mealPlan: mealPlanText });
-    } else {
-      res.status(500).json({ success: false, message: 'Failed to generate meal plan' });
     }
   } catch (error) {
     res.status(500).send({ error: error.message });
@@ -115,41 +120,36 @@ app.post('/generate-meal-plan', async (req, res) => {
 
 // IMAGE: generates an image of the recipe
 app.post('/generate-image', async (req, res) => {
-    try {
-        const { dishName, diet, otherConsiderations } = req.body;
-        const prompt = generateImage(dishName, diet, otherConsiderations);
+  try {
+    const { dishName, diet, otherConsiderations } = req.body;
+    const prompt = generateImage(dishName, diet, otherConsiderations);
 
-        // Generate image using DALL-E
-        const response = await axios.post('https://api.openai.com/v1/images/generations', {
-            model: "dall-e-3",
-            prompt: prompt,
-            n: 1,
-            size: "1024x1024"
-        }, {
-            headers: {
-                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-                'Content-Type': 'application/json'
-            }
-        });
+    const response = await axios.post('https://api.openai.com/v1/images/generations', {
+      model: "dall-e-3",
+      prompt: prompt,
+      n: 1,
+      style: "natural",
+      size: "1024x1024",
+      // size: "256x256"
+    }, {
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
 
-        // Fetch the generated image
-        const imageUrl = response.data.data[0].url;
-        const imageResponse = await axios.get(imageUrl, { responseType: 'arraybuffer' });
-        const imageBuffer = Buffer.from(imageResponse.data, 'binary');
+    const imageUrl = response.data.data[0].url;
+    res.json({ success: true, recipe: imageUrl });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
 
-        // Resize the image to 400x400 using Jimp
-        const resizedImage = await Jimp.read(imageBuffer)
-            .then(image => image.resize(400, 400))
-            .then(image => image.getBufferAsync(Jimp.MIME_PNG));
 
-        // Send the resized image directly to the client
-        res.set('Content-Type', 'image/png');
-        res.send(resizedImage);
 
-    } catch (error) {
-        console.error('Error generating image:', error);
-        res.status(500).send({ error: error.message });
-    }
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
 
 dotenv.config();
