@@ -68,6 +68,7 @@ app.post('/generate-meal-plan', async (req, res) => {
     if (mealPlanner.data && mealPlanner.data.choices && mealPlanner.data.choices.length > 0) {
       const mealPlanText = mealPlanner.data.choices[0].message.content;
       res.json({ success: true, mealPlan: mealPlanText });
+      console.log(mealPlanText);
     } else {
       res.status(500).json({ success: false, message: 'Failed to generate meal plan' });
     }
