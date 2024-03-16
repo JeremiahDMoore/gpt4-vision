@@ -13,11 +13,11 @@ const foodPrompt = "PERSONA=(You are an expert chef, foodie and nutritionist. Yo
 
 // IMAGE: prompt for generating an image for the RECIPE
 function generateImage(dishName, diet, otherConsiderations) {
-  return `IMPORTANT:Use this prompt EXACTLY. DO NOT change or add anything -->("lifelike, realistic ${dishName}, ${diet}, ${otherConsiderations} as real food,(style= plated fancy on a chef table, realistic indoor lighting, )")`
+  return `IMPORTANT:Use this prompt EXACTLY. DO NOT change or add anything -->("lifelike, realistic ${dishName}, ${diet}, ${otherConsiderations} as real food,(style= fancily plated on a kitchen table, natural lighting, real life gourmet cuisine )")`
 }
 // RECIPE: prompt takes user data from profile or other source and generates the recipe
 function generatePrompt(dishName, diet, otherConsiderations) {
-  return `generate a recipe based on ${dishName} and ${otherConsiderations} that is ${diet}, be concise and consistent. IMPORTANT:output in this format -->(Recipe Name <line break> Nutritional Value <line break> Ingredients <line break> Instructions)`
+  return `generate a recipe based on ${dishName} and ${otherConsiderations} that is ${diet}, be concise and consistent. IMPORTANT:output in this format -->(Recipe Name <line break> Nutritional Value <line break> Ingredients <line break>s)` Instruction
 }
 
 // BEGIN CHANGE
