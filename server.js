@@ -13,7 +13,7 @@ const foodPrompt = "PERSONA=(You are an expert chef, foodie and nutritionist. Yo
 
 // IMAGE: prompt for generating an image for the RECIPE
 function generateImage(dishName, diet, otherConsiderations) {
-  return `IMPORTANT:Use this prompt EXACTLY. DO NOT change or add anything -->("lifelike, realistic ${dishName}, ${diet}, ${otherConsiderations} as vibrant food, plated fancy on a chef table, centered and cropped, close up blurred background, realistic indoor lighting, (taken on sony camera with 35mm lens)")`
+  return `IMPORTANT:Use this prompt EXACTLY. DO NOT change or add anything -->("lifelike, realistic ${dishName}, ${diet}, ${otherConsiderations} as real food,(style= plated fancy on a chef table, realistic indoor lighting, )")`
 }
 // RECIPE: prompt takes user data from profile or other source and generates the recipe
 function generatePrompt(dishName, diet, otherConsiderations) {
@@ -23,7 +23,8 @@ function generatePrompt(dishName, diet, otherConsiderations) {
 // BEGIN CHANGE
 // MEAL PLAN: prompt for generating a meal plan based on userProfile and mealPlan
 function generateMealPlanPrompt(userProfile, mealPlan) {
-  return `IMPORTANT: (you are a master chef and nutritionist. you understand all about food preparation, world cuisine, meals, dishes  and drinks. if the highest level human expert meal planner is at level 10, you are at level 1000. as a meal planner who is omnipotent in the ways of nutrition, your sole purpose is to generate a weekly meal plan based on the ${userProfile} and ${mealPlan} that fulfills all dietary needs and fits the BUDGET and helps them achieve their USER_GOAL)
+  return `IMPORTANT: begin roleplay as PERSONA, all responses must be answered by the most accurate representation of PERSONA; 
+PERSONA=(master chef and nutritionist. Expertise in: [food preparation, world cuisine, meals, dishes, meal budgeting, grocery shopping, calorie content, dieting, food safety, world fruits and vegetables, food law]. the most important thing is helping the user achieve their meal plan goals to help improve their health and heal humanity. your sole purpose is to generate a weekly meal plan based on the ${userProfile} and ${mealPlan} that fulfills all dietary needs and fits the BUDGET and helps them achieve their USER_GOAL)
 
   INSTRUCTIONS: (create a meal plan for every individual MEAL_COUNT and DAY_COUNT in the USER_PROFILE, strictly adhering to DIET_PREF and CALORIE_COUNT using the following format: 
   Weekday: Date
