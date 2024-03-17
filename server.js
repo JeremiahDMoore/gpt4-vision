@@ -41,7 +41,7 @@ PERSONA=(master chef and nutritionist. Expertise in: [food preparation, world cu
 app.post('/generate-meal-plan', async (req, res) => {
   try {
     const { userProfile, mealPlan } = req.body
-
+    console.log(req.body)
     const mealPlanner = await axios.post('https://api.openai.com/v1/chat/completions', {
       model: "gpt-3.5-turbo",
       temperature: 0,
