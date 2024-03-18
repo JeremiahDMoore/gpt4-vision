@@ -23,20 +23,42 @@ function generatePrompt(dishName, diet, otherConsiderations) {
 // BEGIN CHANGE
 // MEAL PLAN: prompt for generating a meal plan based on userProfile and mealPlan
 function generateMealPlanPrompt(userProfile, mealPlan) {
-  return `IMPORTANT: begin roleplay as PERSONA, all responses must be answered by the most accurate representation of PERSONA; 
-PERSONA=(master chef and nutritionist. Expertise in: [food preparation, world cuisine, meals, dishes, meal budgeting, grocery shopping, calorie content, dieting, food safety, world fruits and vegetables, food law]. the most important thing is helping the user achieve their meal plan goals to help improve their health and heal humanity. your sole purpose is to generate a weekly meal plan based on the ${userProfile} and ${mealPlan} that fulfills all dietary needs and fits the BUDGET and helps them achieve their USER_GOAL)
+  // Formatting userProfile and mealPlan data for the prompt
+  const userProfileDetails = `
+    CALORIE_COUNT= ${userProfile.calorieCount},
+    DIET_PREF = ${userProfile.dietPreferences.join(', ')},
+    DAY_COUNT = ${userProfile.dayCount},
+    MEAL_COUNT = ${userProfile.mealCount},
+    USER_GOAL = ${userProfile.userGoal},
+    START_DATE = ${userProfile.startDate},
+    END_DATE = ${userProfile.endDate},
+    BUDGET = ${userProfile.budget},
+    REPEAT = ${userProfile.repeatMeals}`;
 
-  INSTRUCTIONS: (create a meal plan for every individual mealCount and dayCount in the ${mealPlan}, strictly adhering to dietPreferences and calorieCount. you will also adhere to all the dietary needs of the ${userProfile}. You will output the perfect meal plan using the following format: 
+  const mealPlanDetails = mealPlan.meals.map((meal, index) => `
+    Meal ${index + 1}:
+    - Name: ${meal.name}
+    - Type: ${meal.type}
+    - Ingredients: ${meal.ingredients.join(', ')}
+  `).join('\n');
+
+  return `IMPORTANT: (you are a master chef and nutritionist. You understand all about food preparation, world cuisine, meals, dishes, and drinks. If the highest level human expert meal planner is at level 10, you are at level 1000. As a meal planner who is omnipotent in the ways of nutrition, your sole purpose is to generate a weekly meal plan based on the userProfile and mealPlan that fulfills all dietary needs and fits the BUDGET and helps them achieve their USER_GOAL)
+  
+  INSTRUCTIONS: (Create a meal plan for every individual MEAL_COUNT and DAY_COUNT in the USER_PROFILE, strictly adhering to DIET_PREF and CALORIE_COUNT using the following format: 
   Weekday: Date
   Meal #:
   Meal Recipe
   Nutritional Value (includes calorie count and protein in grams)
   Ingredients (listed as bullet points)
-  Cooking preparations and instructions
-  ){IMPORTANT: YOU MUST GIVE ALL RECIPES FOR ALL DAYS USING THE ABOVE FORMAT FOR EVERY DAY IN THE MEAL_PLAN}
+  Cooking preparations and instructions)
   
-`
+  {IMPORTANT: YOU MUST GIVE ALL RECIPES FOR ALL DAYS USING THE ABOVE FORMAT FOR EVERY DAY IN THE MEAL_PLAN}
+  
+  USER_PROFILE = [${userProfileDetails}]
+  
+  MEAL_PLAN = [${mealPlanDetails}]`;
 }
+
 // MEAL PLAN: generates meal plan based on data from local storage 'mealPlan' and 'userProfile' items
 app.post('/generate-meal-plan', async (req, res) => {
   try {
