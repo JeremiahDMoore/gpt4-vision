@@ -25,22 +25,20 @@ function generatePrompt(dishName, diet, otherConsiderations) {
 function generateMealPlanPrompt(userProfile, mealPlan) {
   // Formatting userProfile and mealPlan data for the prompt
   const userProfileDetails = `
-    CALORIE_COUNT= ${userProfile.calorieCount},
-    DIET_PREF = ${userProfile.dietPreferences.join(', ')},
-    DAY_COUNT = ${userProfile.dayCount},
-    MEAL_COUNT = ${userProfile.mealCount},
-    USER_GOAL = ${userProfile.userGoal},
-    START_DATE = ${userProfile.startDate},
-    END_DATE = ${userProfile.endDate},
-    BUDGET = ${userProfile.budget},
-    REPEAT = ${userProfile.repeatMeals}`;
+    USER_NAME = ${userProfile.name},
+    USER_DIET = ${userProfile.diet},
+    CONDITIONS = ${userProfile.conditions},
+    CONSIDERATIONS = ${userProfile.otherConsiderations}`
 
-  const mealPlanDetails = mealPlan.meals.map((meal, index) => `
-    Meal ${index + 1}:
-    - Name: ${meal.name}
-    - Type: ${meal.type}
-    - Ingredients: ${meal.ingredients.join(', ')}
-  `).join('\n');
+  const mealPlanDetails = `
+    CALORIE_COUNT= ${mealPlan.calorieCount},
+    DIET_PREF = ${mealPlan.dietPreferences},
+    DAY_COUNT = ${mealPlan.dayCount},
+    MEAL_COUNT = ${mealPlan.mealCount},
+    USER_GOAL = ${mealPlan.userGoal},
+    
+    BUDGET = ${mealPlan.budget},
+    REPEAT = ${mealPlan.repeatMeals}`;
 
   return `IMPORTANT: (you are a master chef and nutritionist. You understand all about food preparation, world cuisine, meals, dishes, and drinks. If the highest level human expert meal planner is at level 10, you are at level 1000. As a meal planner who is omnipotent in the ways of nutrition, your sole purpose is to generate a weekly meal plan based on the userProfile and mealPlan that fulfills all dietary needs and fits the BUDGET and helps them achieve their USER_GOAL)
   
